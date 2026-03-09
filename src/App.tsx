@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Camera, Ruler, Weight, Sparkles, Upload } from 'lucide-react';
+import { Camera, Ruler, Weight, Sparkles } from 'lucide-react';
 import './App.css';
 
 function App() {

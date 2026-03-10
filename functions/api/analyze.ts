@@ -1,13 +1,16 @@
 interface Env {
-  OPENAI_API_KEY: string;
+  "openai-api-key": string;
 }
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   try {
-    const { OPENAI_API_KEY } = context.env;
+    // 하이픈(-)이 포함된 키는 대괄호 표기법을 사용하여 가져와야 합니다.
+    const apiKey = context.env["openai-api-key"];
     
-    if (!OPENAI_API_KEY) {
-      return new Response(JSON.stringify({ error: "OpenAI API Key is not configured." }), {
+    if (!apiKey) {
+      return new Response(JSON.stringify({ 
+        error: "OpenAI API Key ('openai-api-key')가 Cloudflare 환경 변수에 설정되지 않았습니다." 
+      }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
       });
@@ -15,15 +18,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     const { image, height, weight } = await context.request.json() as any;
 
-    // 최신 OpenAI Responses API 구조를 따르는 요청 바디
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENAI_API_KEY}`,
+        "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o", // 비전 분석을 위해 gpt-4o 사용 (구조는 최신 사양 적용)
+        model: "gpt-4o",
         messages: [
           {
             role: "developer",
@@ -65,18 +67,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             ]
           }
         ],
-        // 제시해주신 최신 파라미터 적용
         text: {
-          format: {
-            type: "text"
-          },
+          format: { type: "text" },
           verbosity: "medium"
         },
         reasoning: {
           effort: "medium"
         },
         temperature: 1,
-        max_completion_tokens: 2048, // 최신 표준인 max_completion_tokens 사용
+        max_completion_tokens: 2048,
         top_p: 1,
         store: true,
         include: [

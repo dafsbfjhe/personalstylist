@@ -6,6 +6,7 @@
   # Use https://search.nixos.org/packages to find packages
   packages = [
     pkgs.nodejs_20
+    pkgs.nodePackages.wrangler
   ];
   # Sets environment variables in the workspace
   env = {};
@@ -30,6 +31,10 @@
       previews = {
         web = {
           command = ["npm" "run" "dev" "--" "--port" "$PORT" "--host" "0.0.0.0"];
+          manager = "web";
+        };
+        functions = {
+          command = ["npx" "wrangler" "pages" "dev" "dist" "--port" "8788" "--compatibility-date=2024-03-09"];
           manager = "web";
         };
       };

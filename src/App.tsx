@@ -8,7 +8,7 @@ function App() {
   const [weight, setWeight] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false); // 드래그 상태 관리
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const processFile = (file: File) => {
@@ -28,7 +28,6 @@ function App() {
     if (file) processFile(file);
   };
 
-  // 드래그 앤 드롭 핸들러
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -82,14 +81,15 @@ function App() {
         {!report ? (
           <div className="profile-card">
             <header className="hero-section">
-              <h1 className="title">나만의 스타일 <br/><span>지금 찾기</span></h1>
-              <p className="subtitle">체형과 이미지에 맞는 최적의 스타일링을 <br/>AI 스타일리스트가 제안해 드립니다.</p>
+              <div className="badge">AI Personal Stylist</div>
+              <h1 className="title">당신의 스타일을 <br/><span>새롭게 정의하다</span></h1>
+              <p className="subtitle">AI가 당신의 사진과 체형을 정밀 분석하여 <br/>최상의 스타일링 리포트를 선사합니다.</p>
             </header>
 
             <form onSubmit={handleSubmit} style={{ width: '100%' }}>
               <div className="photo-upload-section">
                 <div 
-                  className={`photo-preview-container ${!photo ? 'empty' : ''} ${isDragging ? 'dragging' : ''}`}
+                  className={`photo-preview-container ${isDragging ? 'dragging' : ''}`}
                   onClick={() => fileInputRef.current?.click()}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
@@ -100,9 +100,11 @@ function App() {
                   ) : (
                     <div className="upload-placeholder">
                       <div className="icon-circle">
-                        {isDragging ? <UploadCloud size={28} /> : <Camera size={28} />}
+                        {isDragging ? <UploadCloud size={32} /> : <Camera size={32} />}
                       </div>
-                      <span>{isDragging ? '여기에 놓으세요' : '사진을 끌어다 놓거나 클릭'}</span>
+                      <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>
+                        {isDragging ? '여기에 놓으세요' : '사진을 끌어오거나 클릭'}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -117,7 +119,7 @@ function App() {
 
               <div className="input-group-row">
                 <div className="input-field">
-                  <label><Ruler size={16} /> 키 (cm)</label>
+                  <label><Ruler size={18} /> 키 (cm)</label>
                   <input 
                     type="number" 
                     placeholder="175"
@@ -127,7 +129,7 @@ function App() {
                   />
                 </div>
                 <div className="input-field">
-                  <label><Weight size={16} /> 몸무게 (kg)</label>
+                  <label><Weight size={18} /> 몸무게 (kg)</label>
                   <input 
                     type="number" 
                     placeholder="70"
@@ -140,9 +142,9 @@ function App() {
 
               <button type="submit" className="cta-button" disabled={loading}>
                 {loading ? (
-                  <Loader2 className="animate-spin" size={20} />
+                  <Loader2 className="animate-spin" size={24} />
                 ) : (
-                  <Sparkles size={20} />
+                  <Sparkles size={24} />
                 )}
                 <span>{loading ? '스타일 분석 중...' : '나만의 스타일을 만들어보세요!'}</span>
               </button>
@@ -150,30 +152,30 @@ function App() {
           </div>
         ) : (
           <div className="report-container">
-            <header className="report-header" style={{ marginBottom: '24px' }}>
-              <div className="success-badge" style={{ marginBottom: '12px' }}>
-                <CheckCircle size={18} />
-                <span>분석 완료</span>
+            <header className="report-header" style={{ marginBottom: '32px' }}>
+              <div className="success-badge">
+                <CheckCircle size={20} />
+                <span>스타일 분석 완료</span>
               </div>
-              <h2 className="report-title" style={{ fontSize: '1.5rem', marginBottom: '8px' }}>스타일 분석 결과</h2>
-              <p className="report-subtitle">AI 퍼스널 스타일 가이드</p>
+              <h2 className="title" style={{ fontSize: '1.75rem', marginBottom: '8px' }}>퍼스널 스타일 가이드</h2>
+              <p className="subtitle">AI가 제안하는 당신을 위한 최적의 코디입니다.</p>
             </header>
             
             <div className="report-card">
               <div className="report-content">
                 {report.split('\n').map((line, i) => (
-                  <p key={i} style={{ marginBottom: '8px' }}>{line || '\u00A0'}</p>
+                  <p key={i} style={{ marginBottom: '10px' }}>{line || '\u00A0'}</p>
                 ))}
               </div>
             </div>
             
             <div className="action-buttons">
               <button onClick={() => setReport(null)} className="secondary-button">
-                <ArrowLeft size={18} />
+                <ArrowLeft size={20} />
                 다시 하기
               </button>
               <button onClick={() => window.print()} className="primary-outline-button">
-                <Download size={18} />
+                <Download size={20} />
                 저장하기
               </button>
             </div>
@@ -181,7 +183,7 @@ function App() {
         )}
       </main>
 
-      <footer className="app-footer" style={{ marginTop: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+      <footer className="app-footer" style={{ marginTop: '32px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', zIndex: 1, position: 'relative' }}>
         Powered by AI Fashion Engine & OpenAI
       </footer>
     </div>

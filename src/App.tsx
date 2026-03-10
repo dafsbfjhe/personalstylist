@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Camera, Ruler, Weight, Sparkles, Loader2, CheckCircle, ArrowLeft, Download } from 'lucide-react';
+import { Camera, Ruler, Weight, Sparkles, Loader2, CheckCircle, ArrowLeft, Download, UploadCloud } from 'lucide-react';
 import './App.css';
 
 function App() {
@@ -8,17 +8,42 @@ function App() {
   const [weight, setWeight] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false); // 드래그 상태 관리
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
+  const processFile = (file: File) => {
+    if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPhoto(reader.result as string);
       };
       reader.readAsDataURL(file);
+    } else {
+      alert('이미지 파일만 업로드 가능합니다.');
     }
+  };
+
+  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  // 드래그 앤 드롭 핸들러
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) processFile(file);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,17 +89,20 @@ function App() {
             <form onSubmit={handleSubmit} style={{ width: '100%' }}>
               <div className="photo-upload-section">
                 <div 
-                  className={`photo-preview-container ${!photo ? 'empty' : ''}`}
+                  className={`photo-preview-container ${!photo ? 'empty' : ''} ${isDragging ? 'dragging' : ''}`}
                   onClick={() => fileInputRef.current?.click()}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
                 >
                   {photo ? (
                     <img src={photo} alt="Preview" className="photo-preview" />
                   ) : (
                     <div className="upload-placeholder">
                       <div className="icon-circle">
-                        <Camera size={28} />
+                        {isDragging ? <UploadCloud size={28} /> : <Camera size={28} />}
                       </div>
-                      <span>사진 업로드</span>
+                      <span>{isDragging ? '여기에 놓으세요' : '사진을 끌어다 놓거나 클릭'}</span>
                     </div>
                   )}
                 </div>

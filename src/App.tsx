@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Camera, Ruler, Weight, Sparkles, Loader2, CheckCircle } from 'lucide-react';
+import { Camera, Ruler, Weight, Sparkles, Loader2, CheckCircle, ArrowLeft, Download } from 'lucide-react';
 import './App.css';
 
 function App() {
@@ -23,7 +23,7 @@ function App() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!photo) return alert('Please upload a photo first!');
+    if (!photo) return alert('먼저 사진을 업로드해주세요!');
 
     setLoading(true);
     setReport(null);
@@ -36,14 +36,17 @@ function App() {
       });
 
       const data = await response.json();
+      
       if (data.choices && data.choices[0]) {
         setReport(data.choices[0].message.content);
       } else if (data.error) {
-        alert(data.error);
+        // API 키가 없는 경우 등 에러 발생 시 안내
+        console.error('API Error:', data.error);
+        alert('분석 중 오류가 발생했습니다. OpenAI API 키 설정을 확인해주세요.');
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to connect to the style analysis engine.');
+      console.error('Connection Error:', error);
+      alert('스타일 분석 엔진에 연결할 수 없습니다.');
     } finally {
       setLoading(false);
     }
@@ -58,8 +61,8 @@ function App() {
           <>
             <header className="hero-section">
               <div className="badge">AI Personal Stylist</div>
-              <h1 className="title">Your Perfect Look <br/><span>Starts Here</span></h1>
-              <p className="subtitle">Upload your photo and details to receive personalized styling recommendations tailored just for you.</p>
+              <h1 className="title">당신에게 딱 맞는 스타일 <br/><span>지금 찾아보세요</span></h1>
+              <p className="subtitle">사진과 기본 정보를 입력하면 AI 스타일리스트가 <br/>맞춤형 코디 제안과 체형 분석 보고서를 작성해 드립니다.</p>
             </header>
 
             <form onSubmit={handleSubmit} className="profile-card">
@@ -75,7 +78,7 @@ function App() {
                       <div className="icon-circle">
                         <Camera size={32} />
                       </div>
-                      <span>Tap to upload your photo</span>
+                      <span>본인 사진을 업로드하세요</span>
                     </div>
                   )}
                 </div>
@@ -90,7 +93,7 @@ function App() {
 
               <div className="input-group-row">
                 <div className="input-field">
-                  <label><Ruler size={18} /> Height (cm)</label>
+                  <label><Ruler size={18} /> 키 (cm)</label>
                   <input 
                     type="number" 
                     placeholder="175"
@@ -100,7 +103,7 @@ function App() {
                   />
                 </div>
                 <div className="input-field">
-                  <label><Weight size={18} /> Weight (kg)</label>
+                  <label><Weight size={18} /> 몸무게 (kg)</label>
                   <input 
                     type="number" 
                     placeholder="70"
@@ -117,27 +120,39 @@ function App() {
                 ) : (
                   <Sparkles size={20} />
                 )}
-                <span>{loading ? 'Analyzing Your Style...' : 'Generate My Style'}</span>
+                <span>{loading ? '스타일 분석 중...' : '나만의 스타일을 만들어보세요!'}</span>
               </button>
             </form>
           </>
         ) : (
           <div className="report-container">
             <header className="report-header">
-              <CheckCircle size={48} className="success-icon" />
-              <h2 className="report-title">Analysis Complete</h2>
-              <p>Here is your personalized style guide</p>
+              <div className="success-badge">
+                <CheckCircle size={20} />
+                <span>분석 완료</span>
+              </div>
+              <h2 className="report-title">나만의 스타일 분석 결과</h2>
+              <p className="report-subtitle">AI가 제안하는 퍼스널 스타일 가이드입니다.</p>
             </header>
             
-            <div className="report-content">
-              {report.split('\n').map((line, i) => (
-                <p key={i}>{line}</p>
-              ))}
+            <div className="report-card">
+              <div className="report-content">
+                {report.split('\n').map((line, i) => (
+                  <p key={i}>{line || '\u00A0'}</p>
+                ))}
+              </div>
             </div>
             
-            <button onClick={() => setReport(null)} className="secondary-button">
-              Start New Analysis
-            </button>
+            <div className="action-buttons">
+              <button onClick={() => setReport(null)} className="secondary-button">
+                <ArrowLeft size={18} />
+                다시 하기
+              </button>
+              <button onClick={() => window.print()} className="primary-outline-button">
+                <Download size={18} />
+                저장하기
+              </button>
+            </div>
           </div>
         )}
       </main>

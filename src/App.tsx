@@ -40,13 +40,13 @@ function App() {
       if (data.choices && data.choices[0]) {
         setReport(data.choices[0].message.content);
       } else if (data.error) {
-        // API 키가 없는 경우 등 에러 발생 시 안내
+        // 백엔드에서 전달한 구체적인 에러 메시지를 보여줍니다.
         console.error('API Error:', data.error);
-        alert('분석 중 오류가 발생했습니다. OpenAI API 키 설정을 확인해주세요.');
+        alert(`분석 중 오류 발생: ${data.error}`);
       }
     } catch (error) {
       console.error('Connection Error:', error);
-      alert('스타일 분석 엔진에 연결할 수 없습니다.');
+      alert('스타일 분석 엔진에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       setLoading(false);
     }
